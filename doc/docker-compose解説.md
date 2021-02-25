@@ -25,8 +25,8 @@ YAML ファイルを使ってアプリケーションの設定を行い、コマ
 ![docker-compose-tutorial](https://user-images.githubusercontent.com/42028429/109179903-b692b100-77cd-11eb-91c8-aee2e4414dc5.png)
 
 ## 起動方法
-上記リポジトリをローカルへclone後、`deply/docker-compose`へ移動し、`docker-compose up`すると立ち上がります。
-その後、ブラウザで `http://localhost:8080`へアクセスするとToDoアプリにアクセスします。
+上記リポジトリをローカルへclone後、`docker-compose up`すると立ち上がります。
+その後、ブラウザで `http://localhost`へアクセスするとToDoアプリにアクセスします。
 
 ## よく利用するdocker-composeコマンド
  `docker-compose up`  
@@ -109,6 +109,21 @@ api:
 
 - `hostname:`
 Dockerネットワーク内で利用するホスト名を設定できます。  
+
+- `ports:`
+コンテナが公開するポートを設定することが出来ます。  
+ホスト側で利用するポート：コンテナ側で開いているポート、と記載します。  
+```yml
+ front:
+ 	ports:
+      - 8080:80 // ホスト側からアクセスする時に8080ポートを指定すると、コンテナ側の80ポートに接続される
+ api:
+ 	ports:
+      - 8081:8080 // ホスト側からアクセスする時に8080ポートを指定すると、コンテナ側の8080ポートに接続される
+  db:
+   	ports:
+      - 3306:3306 // ホスト側から見えるポートもコンテナ側で公開しているポートも3306を指定
+```
 
 - `networks:`
 docker-compose.ymlの下部で独自のDockerネットワークを作成し、そのネットワークにコンテナを参加させることができます。
