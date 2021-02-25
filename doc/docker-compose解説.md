@@ -139,10 +139,11 @@ docker-compose.ymlの下部で独自のDockerネットワークを作成し、�
  	environment:
         MYSQL_ROOT_PASSWORD: admin //ルートパスワードを'admin'に設定
         MYSQL_DATABASE: todo // todoという名前のデータベースを作成
+```
 
-　`volumes:`
+- `volumes:`
 ホストにあるディレクトリやファイルを、コンテナ内のディレクトリにマウントすることができます。
-code: docker-compose.yml
+``` yml
  // nginxの公開用ファイルを置くディレクトリに、index.htmlとindex.jsがあるfrontendフォルダをマウントしている
  front:
  	volumes:
