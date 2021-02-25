@@ -46,12 +46,12 @@ docker-compose.ymlに記載されている内容を元にコンテナを起動�
 ### frontのポート番号を変更してみる
 docker-compose.ymlのポート番号を変更してみましょう
 ```yml
-   front:
-     image: nginx:1.19.7
-     container_name: tutorial-front
-     hostname: tutorial-front
-     ports:
-       - 18080:80 // 80から18080に変更
+front:
+ image: nginx:1.19.7
+ container_name: tutorial-front
+ hostname: tutorial-front
+ ports:
+  - 18080:80 // 80から18080に変更
 ```
 変更後に `docker-compose up`を実行し、 `http://localhost:18080`でToDoアプリにアクセスできれば成功です。
 
@@ -69,13 +69,13 @@ docker-compose.ymlのポート番号を変更してみましょう
 services配下に構築したいサービス名を記載します。その下にそれぞれのサービス毎の設定を記載していきます。  
 今回の場合は、フロントエンド・バックエンド・データベースの3サービスを構築したいので、それぞれfront/api/dbと記載します。  
 ```yml
- services:
- 	front:
- 		（以下略）
- 	api:
- 		（以下略）
- 	db:
- 		（以下略）
+services:
+ front:
+ 	（以下略）
+ api:
+ 	（以下略）
+ db:
+ 	（以下略）
 ```
 
 - `image:`  
@@ -85,8 +85,8 @@ services配下に構築したいサービス名を記載します。その下に
 ```yml
 front:
  	image: nginx:1.19.7
- db:
-  	image: mariadb:10.5.8
+db:
+  image: mariadb:10.5.8
 ```
 
 - `build:`
@@ -94,14 +94,14 @@ Dockerfileを利用してサービスを構築したい場合に利用します�
 今回バックエンドではGoのビルドやホットリロードを行うために、Dockerfileを使って構築しています。  
 ```yml
 api:
- 	build:
-     	context: ../../  // Docker buildを実行する際のディレクトリ。ここではルートディレクトリを設定しています
-     	dockerfile: ./build/docker/Dockerfile // どのファイルをDockerfileとするかを設定します
+ build:
+   context: .  // Docker buildを実行する際のディレクトリ。ここではルートディレクトリを設定しています
+   dockerfile: ./backend/Dockerfile // どのファイルをDockerfileとするかを設定します
 ```
 また、ここで作成するイメージ名を設定する時にはimageを利用します。
 ```yml
- api:
- 	image: docker-compose-tutorial-api // この名前でイメージが作成されます
+api:
+ image: docker-compose-tutorial-api // この名前でイメージが作成されます
 ```
 
 - `container_name:`
@@ -114,74 +114,72 @@ Dockerネットワーク内で利用するホスト名を設定できます。
 コンテナが公開するポートを設定することが出来ます。  
 ホスト側で利用するポート：コンテナ側で開いているポート、と記載します。  
 ```yml
- front:
- 	ports:
-      - 80:80 
- api:
- 	ports:
-      - 8080:8080 
-  db:
-   	ports:
-      - 3306:3306 
+front:
+ ports:
+  - 80:80 
+api:
+ ports:
+  - 8080:8080 
+db:
+ ports:
+  - 3306:3306 
 ```
 
 - `networks:`
 docker-compose.ymlの下部で独自のDockerネットワークを作成し、そのネットワークにコンテナを参加させることができます。
 ```yml
  // 各コンテナを作成した'todo_app'という名前のDockerネットワークに参加させている
- service:
- 	front:
- 		networks:
-         - todo_app
-     api:
-     	networks:
-            - todo_app
-     db:
-     	networks:
-            - todo_app
+service:
+ front:
+  networks:
+   - todo_app
+ api:
+  networks:
+   - todo_app
+ db:
+  networks:
+   - todo_app
             
  // ここで'todo_app'というネットワークを作成している
- networks:
-   todo_app:
-     name: todo_app
+networks:
+ todo_app:
+  name: todo_app
 ```
 
 - `environment:`
 環境変数の設定を行うことができます。  
 ここではdbコンテナのルートパスワード設定およびToDoアプリで利用するデータベース作成を行っています。  
 ```yml
- db:
- 	environment:
-        MYSQL_ROOT_PASSWORD: admin //ルートパスワードを'admin'に設定
-        MYSQL_DATABASE: todo // todoという名前のデータベースを作成
+db:
+ environment:
+  MYSQL_ROOT_PASSWORD: admin //ルートパスワードを'admin'に設定
+  MYSQL_DATABASE: todo // todoという名前のデータベースを作成
 ```
 
 - `volumes:`
 ホストにあるディレクトリやファイルを、コンテナ内のディレクトリにマウントすることができます。
 ``` yml
- // nginxの公開用ファイルを置くディレクトリに、index.htmlとindex.jsがあるfrontendフォルダをマウントしている
- front:
- 	volumes:
-        - ../../frontend:/usr/share/nginx/html
+// nginxの公開用ファイルを置くディレクトリに、index.htmlとindex.jsがあるfrontendフォルダをマウントしている
+front:
+ volumes:
+  - ./frontend:/usr/share/nginx/html
  
- // Goのソースを置くディレクトリにファイルをマウントしている
- api:
- 	volumes:
-        - ../../backend/ToDo:/go/src/github.com/egxp/docker-compose-tutorial/
+// Goのソースを置くディレクトリにファイルをマウントしている
+api:
+ volumes:
+  - ./backend/app:/go/src/github.com/guranytou/docker-compose-todo
   
- //　docker-entrypoint-initdb.dディレクトリにSQLファイルを格納すると、コンテナ起動時に自動実行するので、テーブル作成とテストデータ投入用のSQLファイルをマウントしている
- db:
-     volumes:
-       - ../../provision/mysql/todo.sql:/docker-entrypoint-initdb.d/provision-todo.sql
-       - ../../testdata/mysql/todo.sql:/docker-entrypoint-initdb.d/testdata-todo.sql
+//　docker-entrypoint-initdb.dディレクトリにSQLファイルを格納すると、コンテナ起動時に自動実行するので、テーブル作成とテストデータ投入用のSQLファイルをマウントしている
+db:
+ - ./db/:/docker-entrypoint-initdb.d/
 ```
 
 - `command:`
 コンテナ起動時に実行したいコマンドを記載します。  
 今回はDBコンテナに文字コードを設定するために利用しています。
 ```yml
- db:
- 	command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci
+db:
+ command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci
 ```
 
 ## 参考資料
