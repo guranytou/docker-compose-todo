@@ -22,7 +22,7 @@ YAML ファイルを使ってアプリケーションの設定を行い、コマ
 
 ## 今回使う構成について
 今回の構成は以下の通りです。　
-
+![docker-compose-tutorial](https://user-images.githubusercontent.com/42028429/109179903-b692b100-77cd-11eb-91c8-aee2e4414dc5.png)
 
 ## 起動方法
 上記リポジトリをローカルへclone後、`deply/docker-compose`へ移動し、`docker-compose up`すると立ち上がります。
@@ -107,7 +107,7 @@ api:
 - `container_name:`
 コンテナの名前を設定できます。 
 
-　`hostname:`
+- `hostname:`
 Dockerネットワーク内で利用するホスト名を設定できます。  
 
 - `networks:`
