@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+  front:
+    image: nginx:1.19.7
+    container_name: todo-front
+    hostname: todo-front
+    ports:
+      - 80:80
+    networks:
+      - todo_app
+    volumes:
+      - ./frontend:/usr/share/nginx/html
+  api:
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
+    image: docker-compose-todo-api
+    container_name: todo-api
+    hostname: todo-api
+    networks:
+      - todo_app
+    ports:
+      - 8080:8080
+    volumes:
+      - ./backend/app:/go/src/github.com/guranytou/docker-compose-todo
+  db:
+    image: mariadb:10.5.8
+    container_name: todo-db
+    hostname: todo-db
+    ports:
+      - 3306:3306
+    networks:
+      - todo_app
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: todo
+    volumes:
+      - ./db/:/docker-entrypoint-initdb.d/
+    command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci
+
+networks:
+  todo_app:
+    name: todo_app
