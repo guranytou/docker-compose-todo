@@ -173,7 +173,8 @@ api:
   
 //　docker-entrypoint-initdb.dディレクトリにSQLファイルを格納すると、コンテナ起動時に自動実行するので、テーブル作成とテストデータ投入用のSQLファイルをマウントしている
 db:
- - ./db/:/docker-entrypoint-initdb.d/
+ volumes: 
+  - ./db/:/docker-entrypoint-initdb.d/
 ```
 
 - `command:`  
