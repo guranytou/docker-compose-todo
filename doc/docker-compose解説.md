@@ -29,17 +29,17 @@ YAML ファイルを使ってアプリケーションの設定を行い、コマ
 その後、ブラウザで `http://localhost`へアクセスするとToDoアプリにアクセスします。
 
 ## よく利用するdocker-composeコマンド
- `docker-compose up`  
+- `docker-compose up`  
 docker-compose.ymlに記載されている内容を元にコンテナを起動します。  
 `-d`オプションでバックグラウンド処理ができます。
 
- `docker-compose down`  
+- `docker-compose down`  
 起動したコンテナやコンテナネットワークを停止した後に削除します。
 
-　`docker-compose stop`  
+- `docker-compose stop`  
 起動したコンテナを停止する（削除はしたくない）場合はこのコマンドを利用します。
 
-　`docker-compose run`  
+- `docker-compose run`  
 `docker-compose stop`で停止したコンテナを起動する場合はこのコマンドを利用します。
 
 ## 実際に触ってみよう
@@ -71,7 +71,7 @@ services配下に構築したいサービス名を記載します。その下に
 ```yml
 services:
  front:
- 	（以下略）
+    （以下略）
  api:
  	（以下略）
  db:
@@ -84,19 +84,21 @@ services:
 ※後述するbuild:を利用したapiでもimageを利用していますが、それはbuild:の項で説明します。
 ```yml
 front:
- 	image: nginx:1.19.7
+  image: nginx:1.19.7
 db:
   image: mariadb:10.5.8
 ```
 
-- `build:`
+- `build:`  
 Dockerfileを利用してサービスを構築したい場合に利用します。  
 今回バックエンドではGoのビルドやホットリロードを行うために、Dockerfileを使って構築しています。  
 ```yml
 api:
  build:
-   context: .  // Docker buildを実行する際のディレクトリ。ここではルートディレクトリを設定しています
-   dockerfile: ./backend/Dockerfile // どのファイルをDockerfileとするかを設定します
+   // Docker buildを実行する際のディレクトリ。ここではルートディレクトリを設定しています
+   context: . 
+   // どのファイルをDockerfileとするかを設定します
+   dockerfile: ./backend/Dockerfile
 ```
 また、ここで作成するイメージ名を設定する時にはimageを利用します。
 ```yml
@@ -104,13 +106,13 @@ api:
  image: docker-compose-tutorial-api // この名前でイメージが作成されます
 ```
 
-- `container_name:`
+- `container_name:`  
 コンテナの名前を設定できます。 
 
-- `hostname:`
+- `hostname:`  
 Dockerネットワーク内で利用するホスト名を設定できます。  
 
-- `ports:`
+- `ports:`  
 コンテナが公開するポートを設定することが出来ます。  
 ホスト側で利用するポート：コンテナ側で開いているポート、と記載します。  
 ```yml
@@ -125,7 +127,7 @@ db:
   - 3306:3306 
 ```
 
-- `networks:`
+- `networks:`  
 docker-compose.ymlの下部で独自のDockerネットワークを作成し、そのネットワークにコンテナを参加させることができます。
 ```yml
  // 各コンテナを作成した'todo_app'という名前のDockerネットワークに参加させている
@@ -146,7 +148,7 @@ networks:
   name: todo_app
 ```
 
-- `environment:`
+- `environment:`  
 環境変数の設定を行うことができます。  
 ここではdbコンテナのルートパスワード設定およびToDoアプリで利用するデータベース作成を行っています。  
 ```yml
@@ -156,7 +158,7 @@ db:
   MYSQL_DATABASE: todo // todoという名前のデータベースを作成
 ```
 
-- `volumes:`
+- `volumes:`  
 ホストにあるディレクトリやファイルを、コンテナ内のディレクトリにマウントすることができます。
 ``` yml
 // nginxの公開用ファイルを置くディレクトリに、index.htmlとindex.jsがあるfrontendフォルダをマウントしている
@@ -174,7 +176,7 @@ db:
  - ./db/:/docker-entrypoint-initdb.d/
 ```
 
-- `command:`
+- `command:`  
 コンテナ起動時に実行したいコマンドを記載します。  
 今回はDBコンテナに文字コードを設定するために利用しています。
 ```yml
@@ -183,5 +185,5 @@ db:
 ```
 
 ## 参考資料
-　docker-compose.ymlのレファレンス
+- docker-compose.ymlのレファレンス  
 http://docs.docker.jp/compose/compose-file.html
